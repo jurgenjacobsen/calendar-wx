@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Settings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            width: 200px;
+        }
+        label {
+            font-size: 14px;
+            display: block;
+            margin-top: 10px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 5px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body >
+    <h3>Weather Settings</h3>
+    
+    <label for="city">City:</label>
+    <input type="text" id="city" placeholder="Enter city name">
+    
+    <label for="unit">Temperature Unit:</label>
+    <select id="unit">
+        <option value="metric">Celsius (°C)</option>
+        <option value="imperial">Fahrenheit (°F)</option>
+    </select>
+
+    <button id="save">Save</button>
+
+    <script src="scripts/popup.js"></script>
+</body>
+</html>

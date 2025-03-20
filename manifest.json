@@ -1,0 +1,24 @@
+{
+    "name": "Hello World",
+    "description": "Base Level Extension",
+    "version": "1.0",
+    "manifest_version": 3,
+    "permissions": [ "storage", "scripting"],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "icon.png"
+    },
+    "host_permissions": [
+      "https://calendar.google.com/calendar/*",
+      "https://api.openweathermap.org/*"
+    ],
+    "content_scripts": [
+      {
+        "matches": ["https://calendar.google.com/calendar/*"],
+        "js": ["scripts/content.js"]
+      }
+    ],
+    "background": {
+      "service_worker": "scripts/background.js"
+    }
+}
