@@ -10,5 +10,6 @@ A browser extension that integrates a weekly weather forecast directly into Goog
 📃 **TODO**:
 - [ ] Add current day weather
 - [ ] Add rain (mm/hr) and wind speed (km/h) details
+- [ ] Officially publish the extension on Chrome Web Store
 
 🔧 **Tech Stack**: JavaScript, HTML, CSS, OpenWeather API (or similar)
