@@ -1,26 +1,35 @@
 document.addEventListener("DOMContentLoaded", function () {
     const cityInput = document.getElementById("city");
     const unitSelect = document.getElementById("unit");
+    const apiKeyInput = document.getElementById("apiKey");
     const saveButton = document.getElementById("save");
+    const findApiKey = document.getElementById("findApiKey");
 
     // Load saved preferences when the popup opens
-    chrome.storage.sync.get(["city", "unit"], function (data) {
+    chrome.storage.sync.get(["city", "unit", "apiKey"], function (data) {
         console.log("Loaded from storage:", data); // Debug log
         if (data.city) cityInput.value = data.city;
         if (data.unit) unitSelect.value = data.unit;
+        if (data.apiKey) apiKeyInput.value = data.apiKey;
     });
 
     // Save preferences when the save button is clicked
     saveButton.addEventListener("click", function () {
         const city = cityInput.value.trim();
         const unit = unitSelect.value;
+        const apiKey = apiKeyInput.value.trim();
+
+        if(!apiKey){
+            alert("Please enter an OpenWeatherAPI Key.");
+            return;
+        }
 
         if (!city) {
             alert("Please enter a city name.");
             return;
         }
 
-        chrome.storage.sync.set({ city, unit }, function () {
+        chrome.storage.sync.set({ city, unit, apiKey }, function () {
             if (chrome.runtime.lastError) {
                 console.error("Error saving settings:", chrome.runtime.lastError);
                 return;
@@ -35,6 +44,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 chrome.tabs.reload(tabs[0].id);
             });
         });
+    });
+
+    // Find API key link
+    findApiKey.addEventListener("click", function () {
+        chrome.tabs.create({ url: "https://home.openweathermap.org/api_keys" });
     });
 });
 

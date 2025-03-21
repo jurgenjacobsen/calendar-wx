@@ -1,4 +1,4 @@
-const apiKey = '450da22d8cd2d079e4fc50144d7b15ef'; // Replace with your API key
+let apiKey; // Replace with your API key
 const daysForecast = {}; // Store weather data for caching
 let unit = "metric"; // Default unit (metric = Celsius)
 
@@ -7,9 +7,16 @@ chrome.storage.sync.get(["unit"], function (data) {
 });
 
 async function fetchWeather() {
-    chrome.storage.sync.get(["city", "unit"], async function (data) {
+    chrome.storage.sync.get(["city", "unit", "apiKey"], async function (data) {
         const city = data.city || "Porto"; // Default city
         const unit = data.unit || "metric"; // Default unit (metric = Celsius)
+        apiKey = data.apiKey; // API key
+
+        if (!apiKey) {
+            console.error("Please enter an OpenWeatherAPI Key.");
+            alert("Please enter an OpenWeatherAPI Key.");
+            return;
+        }
 
         const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${unit}`;
 
