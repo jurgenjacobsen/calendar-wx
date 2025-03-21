@@ -1,12 +1,17 @@
 {
-    "name": "Hello World",
-    "description": "Base Level Extension",
+    "name": "Calendar Weather",
+    "description": "An extension that adds a weekly weather forecast to Google Calendar for better event planning.",
     "version": "1.0",
     "manifest_version": 3,
     "permissions": [ "storage", "scripting"],
+    "icons": {
+      "16": "style/icon.png",
+      "48": "style/icon.png",
+      "64": "style/icon.png"
+    },
     "action": {
       "default_popup": "popup.html",
-      "default_icon": "icon.png"
+      "default_icon": "style/icon.png"
     },
     "host_permissions": [
       "https://calendar.google.com/calendar/*",

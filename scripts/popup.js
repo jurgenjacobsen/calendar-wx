@@ -3,14 +3,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const unitSelect = document.getElementById("unit");
     const saveButton = document.getElementById("save");
 
-    // ✅ Load saved preferences when the popup opens
+    // Load saved preferences when the popup opens
     chrome.storage.sync.get(["city", "unit"], function (data) {
         console.log("Loaded from storage:", data); // Debug log
         if (data.city) cityInput.value = data.city;
         if (data.unit) unitSelect.value = data.unit;
     });
 
-    // ✅ Save preferences when the save button is clicked
+    // Save preferences when the save button is clicked
     saveButton.addEventListener("click", function () {
         const city = cityInput.value.trim();
         const unit = unitSelect.value;
@@ -28,9 +28,11 @@ document.addEventListener("DOMContentLoaded", function () {
             
             alert("Settings saved!");           
             
+            // This will refresh the current tab when the settings are saved
             chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                 if (tabs.length === 0) return;
-                chrome.tabs.reload(tabs[0].id);  // This will refresh the current tab
+                if(!tabs[0].url.includes('calendar.google.com')) return;
+                chrome.tabs.reload(tabs[0].id);
             });
         });
     });

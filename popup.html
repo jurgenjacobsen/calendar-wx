@@ -3,39 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Settings</title>
+    <title>Calendar Weather Settings</title>
     <style>
+        @font-face {
+            font-family: 'Noto';
+            font-weight: 300;
+            src: url('style/Noto.ttf') format('truetype');
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            padding: 10px;
-            width: 200px;
+            font-family: 'Noto', 'Arial', sans-serif;
+            min-width: 12rem;
+            background: transparent !important;
         }
         label {
             font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.1ch;
             display: block;
             margin-top: 10px;
         }
         input, select, button {
-            width: 100%;
             padding: 5px;
             margin-top: 5px;
+            border-width: 0.5px;
+            outline: none;
+            border-radius: 5px;
+        }
+
+        button, #unit {
+            width: 100%;
+        }
+
+        .content {
+            padding: 15px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .sub-title {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.75;
         }
     </style>
 </head>
 
 <body >
-    <h3>Weather Settings</h3>
+    <div class="content">
+        <span class="title">GoogleCalendar<br>Weather</span>
+        <span class="sub-title">Settings</span>
     
-    <label for="city">City:</label>
-    <input type="text" id="city" placeholder="Enter city name">
-    
-    <label for="unit">Temperature Unit:</label>
-    <select id="unit">
-        <option value="metric">Celsius (°C)</option>
-        <option value="imperial">Fahrenheit (°F)</option>
-    </select>
+        <label for="city">City</label>
+        <input type="text" id="city" placeholder="Enter city name">
+        
+        <label for="unit">Temperature Unit</label>
+        <select id="unit">
+            <option value="metric">Celsius (°C)</option>
+            <option value="imperial">Fahrenheit (°F)</option>
+        </select>
 
-    <button id="save">Save</button>
+        <button id="save">Save</button>
+    </div>
 
     <script src="scripts/popup.js"></script>
 </body>
