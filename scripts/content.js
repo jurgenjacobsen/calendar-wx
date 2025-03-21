@@ -25,12 +25,14 @@ async function fetchWeather() {
             const weatherData = await response.json();
 
             const dailyData = {};
-            weatherData.list.forEach((entry) => {
+            let results = weatherData.list;
+            results = results.filter((entry) => entry.dt_txt.includes('12:00:00')); // Get only 12:00:00 entries
+            results.forEach((entry) => {
                 const date = entry.dt_txt.split(' ')[0]; // Get the date (YYYY-MM-DD)
                 if (!dailyData[date]) {
                     dailyData[date] = {
                         ...entry.weather[0],
-                        temp: Math.round(entry.main.temp_max)
+                        temp: Math.ceil(entry.main.temp_max)
                     };
                 }
             });
