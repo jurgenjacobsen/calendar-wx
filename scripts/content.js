@@ -26,19 +26,35 @@ async function fetchWeather() {
 
             const dailyData = {};
             let results = weatherData.list;
-            results = results.filter((entry) => entry.dt_txt.includes('12:00:00')); // Get only 12:00:00 entries
+
+            // Get today's date in YYYY-MM-DD format
+            const today = new Date().toISOString().split('T')[0];
+
+            //results = results.filter((entry) => entry.dt_txt.includes('12:00:00')); // Get only 12:00:00 entries
             results.forEach((entry) => {
                 const date = entry.dt_txt.split(' ')[0]; // Get the date (YYYY-MM-DD)
-                if (!dailyData[date]) {
+
+                // If today’s weather hasn’t been set yet, set it (even if it's not 12:00)
+                if (date === today && !dailyData[date]) {
                     dailyData[date] = {
                         ...entry.weather[0],
-                        temp: Math.ceil(entry.main.temp_max)
+                        temp: Math.ceil(entry.main.temp_max),
+                        wind: entry.wind
+                    };
+                }
+
+                // Prioritize the 12:00:00 entry if available
+                if (entry.dt_txt.includes('12:00:00')) {
+                    dailyData[date] = {
+                        ...entry.weather[0],
+                        temp: Math.ceil(entry.main.temp_max),
+                        wind: entry.wind
                     };
                 }
             });
 
             Object.assign(daysForecast, dailyData); // Cache weather data
-            addWeatherIcons(unit);
+            addWeatherIcons();
 
         } catch (error) {
             console.error('Error fetching weather:', error);
@@ -61,10 +77,17 @@ function addWeatherIcons() {
             weatherIcon.style.height = '42px';
             weatherIcon.style.position = 'absolute';
             weatherIcon.style.left = '48px';
-            weatherIcon.title = cpw(daysForecast[formattedDate]?.description ?? '');
+            
+            let wx = daysForecast[formattedDate];
+            if(!wx) return;
+
+            let d = cpw(wx?.description ?? '');
+            let w = `${unit == 'metric' ? `${cMtoK(wx?.wind.speed)} km/h` : `${Math.round(wx?.wind.speed)} mph`} ${degToCode(wx?.wind.deg)}`;
+            let t = `${d.length > 0 ? `${d} - ${w}` : `${w}`}`
+            weatherIcon.title = t;
 
             const weatherTemp = document.createElement('span');
-            weatherTemp.textContent = `${daysForecast[formattedDate]?.temp}°${unit === 'metric' ? 'C' : 'F'}`;
+            weatherTemp.textContent = `${wx?.temp}°${unit === 'metric' ? 'C' : 'F'}`;
             weatherTemp.style.position = 'absolute';
             weatherTemp.style.right = '56px';
             weatherTemp.style.top = '50%';
@@ -86,7 +109,23 @@ function formatDate(dateText) {
 
 function cpw(str) {
     return str.replace(/\b\w/g, letter => letter.toUpperCase());
+}
+
+function degToCode(degrees) {
+    degrees = (degrees % 360 + 360) % 360;
+  
+    const directions = [
+      "N", "NE", "E", "SE", "S", "SW", "W", "NW"
+    ];
+
+    const index = Math.round(degrees / 45) % 8;
+  
+    return directions[index];
   }
+
+function cMtoK(spd) {
+    return Math.round(spd * 3.6);
+}
 
 const observer = new MutationObserver(() => {
     addWeatherIcons();

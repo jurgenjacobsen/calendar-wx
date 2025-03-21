@@ -5,7 +5,7 @@ A browser extension that integrates a weekly weather forecast directly into Goog
 - [X] Displays a 7-day weather forecast within Google Calendar
 - [X] Retrieves location-based weather data for accurate predictions
 - [X] Minimalistic design that blends into the Google Calendar interface
-- [X] Customizable settings for preferred units (°C/°F, mm/in)
+- [X] Customizable settings for preferred units (°C/°F, Kmh/Mph, etc.)
 
 📃 **TODO**:
 - [ ] Add current day weather
