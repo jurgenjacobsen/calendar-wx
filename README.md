@@ -8,7 +8,6 @@ A browser extension that integrates a weekly weather forecast directly into Goog
 - [X] Customizable settings for preferred units (°C/°F, Kmh/Mph, etc.)
 
 📃 **TODO**:
-- [ ] Add current day weather
 - [ ] Officially publish the extension on Chrome Web Store
 
 🔧 **Tech Stack**: JavaScript, HTML, CSS, OpenWeather API (or similar)
