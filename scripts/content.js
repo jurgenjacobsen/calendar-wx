@@ -30,7 +30,6 @@ async function fetchWeather() {
             // Get today's date in YYYY-MM-DD format
             const today = new Date().toISOString().split('T')[0];
 
-            //results = results.filter((entry) => entry.dt_txt.includes('12:00:00')); // Get only 12:00:00 entries
             results.forEach((entry) => {
                 const date = entry.dt_txt.split(' ')[0]; // Get the date (YYYY-MM-DD)
 
@@ -53,6 +52,19 @@ async function fetchWeather() {
                 }
             });
 
+            results.forEach((entry) => {
+                const date = entry.dt_txt.split(' ')[0]; 
+
+                if(dailyData[date]) {
+                    
+                    dailyData[date] = {
+                        ...dailyData[date],
+                        temp: Math.max(dailyData[date]?.temp, Math.ceil(entry.main.temp_max)),
+                    };
+
+                }
+            });
+
             Object.assign(daysForecast, dailyData); // Cache weather data
             addWeatherIcons();
 
@@ -68,6 +80,8 @@ function addWeatherIcons() {
     days.forEach((item) => {
         const dateText = item.getAttribute('aria-label');
         const formattedDate = formatDate(dateText);
+
+        console.log(formattedDate)
 
         if (formattedDate && daysForecast[formattedDate] && !item.querySelector('.weather-icon')) {
             const weatherIcon = document.createElement('img');
@@ -94,6 +108,7 @@ function addWeatherIcons() {
             weatherTemp.style.transform = 'translateY(-50%)';
             weatherTemp.style.fontSize = '14px';
             weatherTemp.style.fontWeight = 'bold';
+            weatherTemp.style.color = '#E3E3E3';
 
             item.appendChild(weatherIcon);
             item.appendChild(weatherTemp);
@@ -102,7 +117,9 @@ function addWeatherIcons() {
 }
 
 function formatDate(dateText) {
-    const date = new Date(dateText);
+    const date = new Date(
+        dateText.replace(', today', '')
+    );
     if (isNaN(date)) return null; // Return null if date is invalid
     return date.toISOString().split('T')[0]?.replace('2001', new Date().getFullYear()); // Extract YYYY-MM-DD
 }
