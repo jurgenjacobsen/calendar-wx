@@ -1,16 +1,18 @@
 document.addEventListener("DOMContentLoaded", function () {
     const cityInput = document.getElementById("city");
     const unitSelect = document.getElementById("unit");
+    const weatherType = document.getElementById("seaWeather");
     const apiKeyInput = document.getElementById("apiKey");
     const saveButton = document.getElementById("save");
     const findApiKey = document.getElementById("findApiKey");
 
     // Load saved preferences when the popup opens
-    chrome.storage.sync.get(["city", "unit", "apiKey"], function (data) {
+    chrome.storage.sync.get(["city", "unit", "apiKey", "seaWeather"], function (data) {
         console.log("Loaded from storage:", data); // Debug log
         if (data.city) cityInput.value = data.city;
         if (data.unit) unitSelect.value = data.unit;
         if (data.apiKey) apiKeyInput.value = data.apiKey;
+        if (data.seaWeather) weatherType.checked = data.seaWeather;
     });
 
     // Save preferences when the save button is clicked
@@ -18,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const city = cityInput.value.trim();
         const unit = unitSelect.value;
         const apiKey = apiKeyInput.value.trim();
+        const seaWeather = weatherType.checked;
 
         if(!apiKey){
             alert("Please enter an OpenWeatherAPI Key.");
@@ -29,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        chrome.storage.sync.set({ city, unit, apiKey }, function () {
+        chrome.storage.sync.set({ city, unit, apiKey, seaWeather }, function () {
             if (chrome.runtime.lastError) {
                 console.error("Error saving settings:", chrome.runtime.lastError);
                 return;

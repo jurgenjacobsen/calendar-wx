@@ -7,9 +7,10 @@ chrome.storage.sync.get(["unit"], function (data) {
 });
 
 async function fetchWeather() {
-    chrome.storage.sync.get(["city", "unit", "apiKey"], async function (data) {
-        const city = data.city || "Porto"; // Default city
+    chrome.storage.sync.get(["city", "unit", "apiKey", "seaWeather"], async function (data) {
+        const city = data.city || ""; // Default city
         const unit = data.unit || "metric"; // Default unit (metric = Celsius)
+        const seaWeather = data.seaWeather || false; // Default to false
         apiKey = data.apiKey; // API key
 
         if (!apiKey) {
@@ -67,7 +68,6 @@ async function fetchWeather() {
 
             Object.assign(daysForecast, dailyData); // Cache weather data
             addWeatherIcons();
-
         } catch (error) {
             console.error('Error fetching weather:', error);
         }
@@ -77,38 +77,24 @@ async function fetchWeather() {
 function addWeatherIcons() {
     const days = document.querySelectorAll('.nUt0vb.sVASAd.nSCxEf');
 
+    if (days.length === 0) return;
+    if (Object.keys(daysForecast).length === 0) return;
+
     days.forEach((item) => {
-        const dateText = item.getAttribute('aria-label');
-        const formattedDate = formatDate(dateText);
+        if (item.querySelector('.weather-icon')) return;
+        if (!item.hasAttribute('aria-label')) return;
+        
+        const date = parseDate(item.getAttribute('aria-label'));
 
-        console.log(formattedDate)
+        if (!date) return;
 
-        if (formattedDate && daysForecast[formattedDate] && !item.querySelector('.weather-icon')) {
-            const weatherIcon = document.createElement('img');
-            weatherIcon.src = `https://openweathermap.org/img/wn/${daysForecast[formattedDate]?.icon}@2x.png`;
-            weatherIcon.classList.add('weather-icon');
-            weatherIcon.style.width = '42px';
-            weatherIcon.style.height = '42px';
-            weatherIcon.style.position = 'absolute';
-            weatherIcon.style.left = '48px';
+        if (date && daysForecast[date]) {
+
+            let wx = daysForecast[date];
+
+            const weatherIcon = createWeatherIcon(wx, wx?.icon, date);
             
-            let wx = daysForecast[formattedDate];
-            if(!wx) return;
-
-            let d = cpw(wx?.description ?? '');
-            let w = `${unit == 'metric' ? `${cMtoK(wx?.wind.speed)} km/h` : `${Math.round(wx?.wind.speed)} mph`} ${degToCode(wx?.wind.deg)}`;
-            let t = `${d.length > 0 ? `${d} - ${w}` : `${w}`}`
-            weatherIcon.title = t;
-
-            const weatherTemp = document.createElement('span');
-            weatherTemp.textContent = `${wx?.temp}°${unit === 'metric' ? 'C' : 'F'}`;
-            weatherTemp.style.position = 'absolute';
-            weatherTemp.style.right = '56px';
-            weatherTemp.style.top = '50%';
-            weatherTemp.style.transform = 'translateY(-50%)';
-            weatherTemp.style.fontSize = '14px';
-            weatherTemp.style.fontWeight = 'bold';
-            weatherTemp.style.color = '#E3E3E3';
+            const weatherTemp = createTempSpan(wx, unit, date);
 
             item.appendChild(weatherIcon);
             item.appendChild(weatherTemp);
@@ -116,12 +102,67 @@ function addWeatherIcons() {
     });
 }
 
-function formatDate(dateText) {
-    const date = new Date(
-        dateText.replace(', today', '')
-    );
-    if (isNaN(date)) return null; // Return null if date is invalid
-    return date.toISOString().split('T')[0]?.replace('2001', new Date().getFullYear()); // Extract YYYY-MM-DD
+function createTempSpan(wx, unit, date) {
+    const weatherTemp = document.createElement('span');
+    weatherTemp.textContent = `${wx?.temp}°${unit === 'metric' ? 'C' : 'F'}`;
+    weatherTemp.style.position = 'absolute';
+    weatherTemp.style.right = '56px';
+    weatherTemp.style.top = '50%';
+    weatherTemp.style.transform = 'translateY(-50%)';
+    weatherTemp.style.fontSize = '14px';
+    weatherTemp.style.fontWeight = 'bold';
+    weatherTemp.style.color = '#E3E3E3';
+
+    weatherTemp.setAttribute('aria-label', date);
+
+    return weatherTemp;
+}
+
+function createWeatherIcon(wx, icon, date) {
+    const weatherIcon = document.createElement('img');
+    weatherIcon.src = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+    weatherIcon.classList.add('weather-icon');
+    weatherIcon.style.width = '42px';
+    weatherIcon.style.height = '42px';
+    weatherIcon.style.position = 'absolute';
+    weatherIcon.style.left = '48px';
+
+    let d = cpw(wx?.description ?? '');
+    let w = `${unit == 'metric' ? `${cMtoK(wx?.wind.speed)} km/h` : `${Math.round(wx?.wind.speed)} mph`} ${degToCode(wx?.wind.deg)}`;
+    let t = `${d.length > 0 ? `${d} - ${w}` : `${w}`}`
+    weatherIcon.title = t;
+
+    weatherIcon.setAttribute('aria-label', date);
+
+    return weatherIcon;
+}
+
+function parseDate(dateText) {
+    if (!dateText) return null;
+    let txt = dateText.replace(', today', '').trim();
+    const dateParts = txt.match(/(\d{1,2}) (\w+)/);
+
+    if (!dateParts) return null;
+
+    const day = parseInt(dateParts[1], 10);
+    const monthName = dateParts[2];
+
+    const months = {
+        "January": 0, "February": 1, "March": 2, "April": 3, "May": 4, "June": 5,
+        "July": 6, "August": 7, "September": 8, "October": 9, "November": 10, "December": 11
+    };
+
+    if (!(monthName in months)) return null;
+
+    const year = new Date().getFullYear();
+
+    const date = new Date(year, months[monthName], day, 12, 0, 0); // Noon to avoid timezone shifts
+
+    const formattedDate = date.getFullYear() + '-' +
+        String(date.getMonth() + 1).padStart(2, '0') + '-' +
+        String(date.getDate()).padStart(2, '0');
+
+    return formattedDate;
 }
 
 function cpw(str) {
