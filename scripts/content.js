@@ -1,6 +1,7 @@
 "use strict";
 let apiKey;
 const daysForecast = {};
+const daysForecastHourly = {};
 let unit = 'metric';
 chrome.storage.sync.get(['unit'], (data) => {
     if (data.unit)
@@ -49,7 +50,23 @@ async function fetchWeather() {
                     };
                 }
             });
+            const hourlyData = {};
+            results.forEach((entry) => {
+                const date = entry.dt_txt.split(' ')[0];
+                const time = entry.dt_txt.split(' ')[1].substring(0, 5);
+                if (!hourlyData[date])
+                    hourlyData[date] = [];
+                hourlyData[date].push({
+                    time,
+                    description: entry.weather[0].description,
+                    icon: entry.weather[0].icon,
+                    temp: Math.ceil(entry.main.temp),
+                    humidity: entry.main.humidity,
+                    wind: entry.wind,
+                });
+            });
             Object.assign(daysForecast, dailyData);
+            Object.assign(daysForecastHourly, hourlyData);
             addWeatherIcons();
         }
         catch (error) {
@@ -106,6 +123,12 @@ function createWeatherIcon(wx, icon, date) {
     const t = `${d.length > 0 ? `${d} - ${w}` : `${w}`}`;
     weatherIcon.title = t;
     weatherIcon.setAttribute('aria-label', date);
+    weatherIcon.style.cursor = 'pointer';
+    weatherIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        showDetailPopup(date);
+    });
     return weatherIcon;
 }
 function parseDate(dateText) {
@@ -153,6 +176,119 @@ function degreesToDirection(degrees) {
 }
 function convertMsToKmh(spd) {
     return Math.round(spd * 3.6);
+}
+function formatDateHeading(dateStr) {
+    const parts = dateStr.split('-');
+    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0);
+    return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+    });
+}
+function showDetailPopup(date) {
+    const existing = document.getElementById('cwx-detail-overlay');
+    if (existing)
+        existing.remove();
+    const hourly = daysForecastHourly[date];
+    const daily = daysForecast[date];
+    if (!hourly && !daily)
+        return;
+    const overlay = document.createElement('div');
+    overlay.id = 'cwx-detail-overlay';
+    overlay.style.cssText =
+        'position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:99999;display:flex;align-items:center;justify-content:center;';
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay)
+            overlay.remove();
+    });
+    const popup = document.createElement('div');
+    popup.style.cssText =
+        'background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);max-width:420px;width:90%;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;font-family:"Google Sans",Roboto,Arial,sans-serif;';
+    // Header
+    const header = document.createElement('div');
+    header.style.cssText =
+        'background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;';
+    const headerLeft = document.createElement('div');
+    const title = document.createElement('div');
+    title.textContent = formatDateHeading(date);
+    title.style.cssText = 'font-size:16px;font-weight:600;';
+    headerLeft.appendChild(title);
+    if (daily) {
+        const subtitle = document.createElement('div');
+        subtitle.textContent = `${capitalizeWords(daily.description)} · ${daily.temp}°${unit === 'metric' ? 'C' : 'F'}`;
+        subtitle.style.cssText = 'font-size:12px;opacity:0.9;margin-top:2px;';
+        headerLeft.appendChild(subtitle);
+    }
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    closeBtn.style.cssText =
+        'background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px 8px;line-height:1;opacity:0.8;';
+    closeBtn.addEventListener('click', () => overlay.remove());
+    header.appendChild(headerLeft);
+    header.appendChild(closeBtn);
+    popup.appendChild(header);
+    // Content
+    const content = document.createElement('div');
+    content.style.cssText = 'overflow-y:auto;padding:8px 0;';
+    if (hourly && hourly.length > 0) {
+        hourly.forEach((entry, i) => {
+            const row = document.createElement('div');
+            row.style.cssText =
+                'display:flex;align-items:center;padding:10px 20px;gap:12px;' +
+                    (i < hourly.length - 1 ? 'border-bottom:1px solid #f0f0f0;' : '');
+            // Time
+            const timeEl = document.createElement('div');
+            timeEl.textContent = entry.time;
+            timeEl.style.cssText =
+                'font-size:14px;font-weight:600;color:#202124;min-width:44px;';
+            row.appendChild(timeEl);
+            // Icon
+            const iconEl = document.createElement('img');
+            iconEl.src = `https://openweathermap.org/img/wn/${entry.icon}@2x.png`;
+            iconEl.style.cssText = 'width:36px;height:36px;flex-shrink:0;';
+            row.appendChild(iconEl);
+            // Description + humidity
+            const descCol = document.createElement('div');
+            descCol.style.cssText = 'flex:1;min-width:0;';
+            const descEl = document.createElement('div');
+            descEl.textContent = capitalizeWords(entry.description);
+            descEl.style.cssText =
+                'font-size:13px;color:#202124;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+            const humEl = document.createElement('div');
+            humEl.textContent = `Humidity: ${entry.humidity}%`;
+            humEl.style.cssText = 'font-size:11px;color:#5f6368;margin-top:1px;';
+            descCol.appendChild(descEl);
+            descCol.appendChild(humEl);
+            row.appendChild(descCol);
+            // Temp
+            const tempEl = document.createElement('div');
+            tempEl.textContent = `${entry.temp}°${unit === 'metric' ? 'C' : 'F'}`;
+            tempEl.style.cssText =
+                'font-size:15px;font-weight:600;color:#202124;min-width:42px;text-align:right;';
+            row.appendChild(tempEl);
+            // Wind
+            const windEl = document.createElement('div');
+            const windSpeed = unit === 'metric'
+                ? `${convertMsToKmh(entry.wind.speed)} km/h`
+                : `${Math.round(entry.wind.speed)} mph`;
+            windEl.textContent = `${windSpeed} ${degreesToDirection(entry.wind.deg)}`;
+            windEl.style.cssText =
+                'font-size:11px;color:#5f6368;min-width:72px;text-align:right;';
+            row.appendChild(windEl);
+            content.appendChild(row);
+        });
+    }
+    else {
+        const noData = document.createElement('div');
+        noData.textContent = 'No detailed forecast data available for this day.';
+        noData.style.cssText =
+            'padding:24px 20px;text-align:center;color:#5f6368;font-size:14px;';
+        content.appendChild(noData);
+    }
+    popup.appendChild(content);
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
 }
 const observer = new MutationObserver(() => {
     addWeatherIcons();
