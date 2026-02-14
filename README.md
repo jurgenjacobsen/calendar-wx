@@ -1,4 +1,4 @@
-# calendar-wx
+# Calendar Weather Extension
 A browser extension that integrates a weekly weather forecast directly into Google Calendar. Displays temperature, precipitation, and other key weather details for your scheduled events, helping you plan ahead with weather insights. Built for seamless integration and minimal UI interference.
 
 🚀 **Features**:
