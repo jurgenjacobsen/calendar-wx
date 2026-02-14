@@ -11,71 +11,240 @@
             src: url('style/Noto.ttf') format('truetype');
         }
 
-        body {
-            font-family: 'Noto', 'Arial', sans-serif;
-            min-width: 12rem;
-            background: transparent !important;
-        }
-        label {
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.1ch;
-            display: block;
-            margin-top: 10px;
-        }
-        input, select, button {
-            padding: 5px;
-            margin-top: 5px;
-            border-width: 0.5px;
-            outline: none;
-            border-radius: 5px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        button, #unit {
-            width: 100%;
+        body {
+            font-family: 'Noto', 'Segoe UI', Arial, sans-serif;
+            width: 320px;
+            background: #f8f9fa;
+            color: #202124;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 4px;
         }
 
         .content {
-            padding: 15px;
-            background-color: #f1f1f1;
-            border-radius: 5px;
+            padding: 16px 20px 20px;
         }
 
-        .title {
-            font-size: 16px;
-            font-weight: 700;
+        .field-group {
+            margin-bottom: 14px;
         }
-        .sub-title {
+
+        .field-group label {
             display: block;
             font-size: 12px;
             font-weight: 600;
-            opacity: 0.75;
+            color: #5f6368;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .field-group input[type="text"],
+        .field-group select {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            background: #fff;
+            color: #202124;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .field-group input[type="text"]:focus,
+        .field-group select:focus {
+            border-color: #4285f4;
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+
+        .field-group input[type="text"]::placeholder {
+            color: #9aa0a6;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-top: 1px solid #e8eaed;
+            margin-bottom: 14px;
+        }
+
+        .toggle-row label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #202124;
+            text-transform: none;
+            letter-spacing: normal;
+            margin: 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 22px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #dadce0;
+            border-radius: 22px;
+            transition: background 0.2s;
+        }
+
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: #4285f4;
+        }
+
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(18px);
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.15s;
+        }
+
+        .btn-primary {
+            background: #4285f4;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #3367d6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: #4285f4;
+            border: 1px solid #dadce0;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f3f4;
+        }
+
+        .status-message {
+            display: none;
+            margin-top: 10px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .status-message.success {
+            background: #e6f4ea;
+            color: #137333;
+        }
+
+        .status-message.error {
+            background: #fce8e6;
+            color: #c5221f;
         }
     </style>
 </head>
 
-<body >
+<body>
+    <div class="header">
+        <div class="header-title">Calendar Weather</div>
+        <div class="header-subtitle">Weather forecast for Google Calendar</div>
+    </div>
+
     <div class="content">
-        <span class="title">GoogleCalendar<br>Weather</span>
-        <span class="sub-title">Settings</span>
-    
-        <label for="apiKey">API Key</label>
-        <input type="text" id="apiKey" placeholder="Enter API key">
+        <div class="field-group">
+            <label for="apiKey">API Key</label>
+            <input type="text" id="apiKey" placeholder="Enter your OpenWeather API key">
+        </div>
 
-        <label for="city">City</label>
-        <input type="text" id="city" placeholder="Enter city name">
-        
-        <label for="unit">Temperature Unit</label>
-        <select id="unit">
-            <option value="metric">Celsius (°C)</option>
-            <option value="imperial">Fahrenheit (°F)</option>
-        </select>
+        <div class="field-group">
+            <label for="city">City</label>
+            <input type="text" id="city" placeholder="e.g. London, New York">
+        </div>
 
-        <label>Sea Weather</label>
-        <input type="checkbox" id="seaWeather">
+        <div class="field-group">
+            <label for="unit">Temperature Unit</label>
+            <select id="unit">
+                <option value="metric">Celsius (°C)</option>
+                <option value="imperial">Fahrenheit (°F)</option>
+            </select>
+        </div>
 
-        <button id="save">Save</button>
-        <button id="findApiKey">Find the API Key</button>
+        <div class="toggle-row">
+            <label for="seaWeather">Sea Weather</label>
+            <div class="toggle-switch">
+                <input type="checkbox" id="seaWeather">
+                <span class="toggle-slider"></span>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="save">Save Settings</button>
+            <button class="btn btn-secondary" id="findApiKey">Get an API Key</button>
+        </div>
+
+        <span id="statusMessage" class="status-message"></span>
     </div>
 
     <script src="scripts/popup.js"></script>

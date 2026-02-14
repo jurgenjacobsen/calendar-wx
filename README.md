@@ -10,4 +10,30 @@ A browser extension that integrates a weekly weather forecast directly into Goog
 📃 **TODO**:
 - [ ] Officially publish the extension on Chrome Web Store
 
-🔧 **Tech Stack**: JavaScript, HTML, CSS, OpenWeather API (or similar)
+🔧 **Tech Stack**: TypeScript, HTML, CSS, OpenWeather API
+
+## Development
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18+)
+
+### Setup
+```bash
+npm install
+```
+
+### Build
+```bash
+npm run build
+```
+
+### Watch mode
+```bash
+npm run watch
+```
+
+### Loading the extension
+1. Run `npm run build` to compile TypeScript
+2. Open `chrome://extensions/` in Chrome
+3. Enable **Developer mode**
+4. Click **Load unpacked** and select the project folder
