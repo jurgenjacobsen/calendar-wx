@@ -65,7 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
         { active: true, currentWindow: true },
         (tabs: chrome.tabs.Tab[]) => {
           if (tabs.length === 0) return;
-          if (!tabs[0].url?.includes('calendar.google.com')) return;
+          try {
+            const tabUrl = new URL(tabs[0].url ?? '');
+            if (tabUrl.hostname !== 'calendar.google.com') return;
+          } catch {
+            return;
+          }
           if (tabs[0].id) chrome.tabs.reload(tabs[0].id);
         },
       );
