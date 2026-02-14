@@ -1,7 +1,7 @@
 {
     "name": "Calendar Weather",
     "description": "An extension that adds a weekly weather forecast to Google Calendar for better event planning.",
-    "version": "1.0",
+    "version": "2.0.0",
     "manifest_version": 3,
     "permissions": [ "storage", "scripting"],
     "icons": {
