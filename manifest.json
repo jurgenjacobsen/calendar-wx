@@ -5,17 +5,18 @@
     "manifest_version": 3,
     "permissions": [ "storage", "scripting"],
     "icons": {
-      "16": "style/icon.png",
-      "48": "style/icon.png",
-      "64": "style/icon.png"
+      "16": "styles/icon.png",
+      "48": "styles/icon.png",
+      "64": "styles/icon.png"
     },
     "action": {
       "default_popup": "popup.html",
-      "default_icon": "style/icon.png"
+      "default_icon": "styles/icon.png"
     },
     "host_permissions": [
       "https://calendar.google.com/calendar/*",
-      "https://api.openweathermap.org/*"
+      "https://api.openweathermap.org/*",
+      "https://marine-api.open-meteo.com/*"
     ],
     "content_scripts": [
       {

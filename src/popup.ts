@@ -3,11 +3,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const unitSelect = document.getElementById('unit') as HTMLSelectElement;
   const weatherType = document.getElementById('seaWeather') as HTMLInputElement;
   const apiKeyInput = document.getElementById('apiKey') as HTMLInputElement;
+  const toggleApiKey = document.getElementById(
+    'toggleApiKey',
+  ) as HTMLButtonElement;
   const saveButton = document.getElementById('save') as HTMLButtonElement;
   const findApiKey = document.getElementById('findApiKey') as HTMLButtonElement;
   const statusMessage = document.getElementById(
     'statusMessage',
   ) as HTMLSpanElement;
+
+  function setApiKeyVisibility(show: boolean): void {
+    apiKeyInput.type = show ? 'text' : 'password';
+    toggleApiKey.textContent = show ? 'Hide' : 'Show';
+    toggleApiKey.setAttribute('aria-pressed', String(show));
+    toggleApiKey.setAttribute(
+      'aria-label',
+      show ? 'Hide API key' : 'Show API key',
+    );
+  }
 
   // Load saved preferences when the popup opens
   chrome.storage.sync.get(
@@ -33,6 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
       statusMessage.style.display = 'none';
     }, 3000);
   }
+
+  setApiKeyVisibility(false);
+
+  toggleApiKey.addEventListener('click', () => {
+    setApiKeyVisibility(apiKeyInput.type === 'password');
+  });
 
   // Save preferences when the save button is clicked
   saveButton.addEventListener('click', () => {

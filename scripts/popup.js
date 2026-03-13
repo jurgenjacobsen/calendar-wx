@@ -4,9 +4,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const unitSelect = document.getElementById('unit');
     const weatherType = document.getElementById('seaWeather');
     const apiKeyInput = document.getElementById('apiKey');
+    const toggleApiKey = document.getElementById('toggleApiKey');
     const saveButton = document.getElementById('save');
     const findApiKey = document.getElementById('findApiKey');
     const statusMessage = document.getElementById('statusMessage');
+    function setApiKeyVisibility(show) {
+        apiKeyInput.type = show ? 'text' : 'password';
+        toggleApiKey.textContent = show ? 'Hide' : 'Show';
+        toggleApiKey.setAttribute('aria-pressed', String(show));
+        toggleApiKey.setAttribute('aria-label', show ? 'Hide API key' : 'Show API key');
+    }
     // Load saved preferences when the popup opens
     chrome.storage.sync.get(['city', 'unit', 'apiKey', 'seaWeather'], (data) => {
         if (data.city)
@@ -26,6 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMessage.style.display = 'none';
         }, 3000);
     }
+    setApiKeyVisibility(false);
+    toggleApiKey.addEventListener('click', () => {
+        setApiKeyVisibility(apiKeyInput.type === 'password');
+    });
     // Save preferences when the save button is clicked
     saveButton.addEventListener('click', () => {
         const city = cityInput.value.trim();
