@@ -6,6 +6,7 @@ A browser extension that integrates a weekly weather forecast directly into Goog
 - [X] Retrieves location-based weather data for accurate predictions
 - [X] Minimalistic design that blends into the Google Calendar interface
 - [X] Customizable settings for preferred units (°C/°F, Kmh/Mph, etc.)
+- [X] Sea Weather - Tides and Waves
 
 📃 **TODO**:
 - [ ] Officially publish the extension on Chrome Web Store
