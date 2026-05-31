@@ -757,11 +757,23 @@ function showDetailPopup(date) {
     overlay.appendChild(popup);
     document.body.appendChild(overlay);
 }
-const observer = new MutationObserver(() => {
-    addWeatherIcons();
+const observer = new MutationObserver((mutations) => {
+    const shouldUpdate = mutations.some((m) => m.type === 'childList' ||
+        (m.type === 'attributes' && m.attributeName === 'aria-label'));
+    if (shouldUpdate) {
+        addWeatherIcons();
+    }
 });
 observer.observe(document.body, {
     childList: true,
     subtree: true,
+    attributes: true,
+    attributeFilter: ['aria-label'],
 });
-fetchWeather();
+// Initial fetch
+if (document.readyState === 'complete') {
+    fetchWeather();
+}
+else {
+    window.addEventListener('load', () => fetchWeather());
+}

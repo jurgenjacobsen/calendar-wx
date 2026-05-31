@@ -3,11 +3,12 @@
     "description": "An extension that adds a weekly weather forecast to Google Calendar for better event planning.",
     "version": "2.0.0",
     "manifest_version": 3,
-    "permissions": [ "storage", "scripting"],
+    "permissions": [ "storage" ],
     "icons": {
       "16": "styles/icon.png",
       "48": "styles/icon.png",
-      "64": "styles/icon.png"
+      "64": "styles/icon.png",
+      "128": "styles/icon.png"
     },
     "action": {
       "default_popup": "popup.html",
